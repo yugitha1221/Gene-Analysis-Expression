@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microarray & Expression Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background: #495057;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        h1, h3 {
+            color: #ffc107;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+        #results {
+            color: #212529;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Microarray & Expression Analyzer</h1>
+
+        <!-- Decorative Image -->
+        <div class="text-center mb-4">
+            <img src="gene.png" alt="Gene Expression Visualization" class="img-fluid rounded">
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="mb-4">
+            <h3>Upload Data</h3>
+            <form id="uploadForm">
+                <div class="mb-3">
+                    <label for="fileUpload" class="form-label">Upload CSV File:</label>
+                    <input type="file" class="form-control" id="fileUpload" accept=".csv">
+                </div>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+            </form>
+        </div>
+
+        <!-- Preprocessing Options -->
+        <div class="mb-4">
+            <h3>Preprocessing Options</h3>
+            <form>
+                <div class="mb-3">
+                    <label for="normalizationMethod" class="form-label">Select Normalization Method:</label>
+                    <select class="form-select" id="normalizationMethod">
+                        <option value="log">Log Transformation</option>
+                        <option value="zscore">Z-Score Normalization</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" id="preprocessButton">Apply Preprocessing</button>
+            </form>
+        </div>
+
+        <!-- Analysis Options -->
+        <div class="mb-4">
+            <h3>Analysis</h3>
+            <form>
+                <div class="mb-3">
+                    <label for="analysisType" class="form-label">Select Analysis Type:</label>
+                    <select class="form-select" id="analysisType">
+                        <option value="heatmap">Generate Heatmap</option>
+                        <option value="volcano">Volcano Plot</option>
+                        <option value="foldchange">Fold Change Analysis</option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" id="analyzeButton">Run Analysis</button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div class="mb-4">
+            <h3>Results</h3>
+            <p>After processing, results will appear here:</p>
+            <div id="results" class="p-3 border rounded">
+                <p>No results yet. Upload and process your data.</p>
+            </div>
+            <button type="button" class="btn btn-success mt-3" id="downloadButton" disabled>Download Results</button>
+        </div>
+    </div>
+
+    <script>
+        // Dummy Event Listeners for Buttons
+        document.getElementById('uploadButton').addEventListener('click', () => {
+            alert('File uploaded successfully!');
+        });
+
+        document.getElementById('preprocessButton').addEventListener('click', () => {
+            const method = document.getElementById('normalizationMethod').value;
+            alert(`Preprocessing applied using ${method}.`);
+        });
+
+        document.getElementById('analyzeButton').addEventListener('click', () => {
+            const analysis = document.getElementById('analysisType').value;
+            document.getElementById('results').innerHTML = `<p>${analysis} results generated! Visualizations will appear here.</p>`;
+            document.getElementById('downloadButton').disabled = false;
+        });
+
+        document.getElementById('downloadButton').addEventListener('click', () => {
+            alert('Downloading results...');
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

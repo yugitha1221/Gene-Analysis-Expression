@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preprocessing</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+          body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/wallpaper.png') !important;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Make sure the body takes full height of the viewport */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Preprocessing</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="expression_file">Expression Data:</label>
+        <input type="file" name="expression_file" required>
+        <label for="preprocess_type">Preprocessing Type:</label>
+        <select name="preprocess_type">
+            <option value="minmax">Min-Max Scaling</option>
+            <option value="zscore">Z-Score Standardization</option>
+            <option value="log">Log Transformation</option>
+        </select>
+        <button type="submit">Preprocess</button>
+    </form>
+</body>
+</html>

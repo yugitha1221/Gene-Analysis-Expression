@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+</head>
+<body>
+    <h1>Analysis Results</h1>
+    
+    <h2>Volcano Plot</h2>
+    <!-- Display the plot -->
+    <img src="{{ url_for('static', filename='volcano_plot.png') }}" alt="Volcano Plot" width="600">
+    
+    <!-- Provide a download link for the plot -->
+    <p><a href="/static/volcano_plot.png" download>Download Volcano Plot</a></p>
+
+
+    <h2>Download Results</h2>
+    <a href="{{ url_for('serve_processed_file', filename='differential_expression_results.csv') }}" download>Download CSV of Differential Expression Results</a>
+</body>
+</html>

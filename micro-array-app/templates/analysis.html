@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Differential Expression Analysis</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="file"],
+        input[type="text"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: 0.3s ease-in-out;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .download-buttons a {
+            text-decoration: none;
+            color: white;
+            background-color: #2c3e50;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 48%;
+            transition: 0.3s ease-in-out;
+        }
+
+        .download-buttons a:hover {
+            background-color: #1a252f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Differential Expression Analysis</h1>
+    <div class="download-buttons">
+        <a href="/static/meta1.csv" download>Download Sample Metadata</a>
+        <a href="/static/expression1.csv" download>Download Sample Expression Data</a>
+    </div>
+    <br>
+    <form id="analysisForm" enctype="multipart/form-data" method="POST">
+        <label for="expression_file">Expression Data:</label>
+        <input type="file" name="expression_file" required><br><br>
+      
+        <label for="metadata_file">Metadata File:</label>
+        <input type="file" name="metadata_file" required><br><br>
+      
+        <label for="fold_change">Fold Change Cutoff:</label>
+        <input type="text" name="fold_change" value="1.5"><br><br>
+      
+        <label for="p_value">P-Value Cutoff:</label>
+        <input type="text" name="p_value" value="0.05"><br><br>
+      
+        <button type="submit">Analyze</button>
+    </form>
+      
+    <div id="results"></div>
+      
+    <script>
+        document.getElementById("analysisForm").addEventListener("submit", async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+        
+            const formData = new FormData(this);
+            const resultsDiv = document.getElementById("results");
+        
+            try {
+                const response = await fetch("/analysis", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+        
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.filename) {
+                        resultsDiv.innerHTML = `
+                            <p>Analysis complete.</p>
+                            <a href="/processed/${data.filename}" download>Download Results</a>`;
+                    } else {
+                        resultsDiv.innerHTML = `<p>An error occurred: ${data.error}</p>`;
+                    }
+                } else {
+                    const error = await response.json();
+                    resultsDiv.innerHTML = `<p>Error: ${error.error}</p>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `<p>An unexpected error occurred: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
