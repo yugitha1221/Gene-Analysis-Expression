@@ -17,6 +17,8 @@ app.secret_key = 'your_secret_key'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['PROCESSED_FOLDER'], exist_ok=True)
 os.makedirs(app.config['STATIC_FOLDER'], exist_ok=True)
+app.add_url_rule('/processed/<path:filename>', endpoint='processed', view_func=lambda filename: send_from_directory(app.config['PROCESSED_FOLDER'], filename))
+
 
 # Home page
 @app.route('/')
@@ -209,38 +211,35 @@ def perform_analysis(expression_path, metadata_path, fold_change_cutoff, p_value
     return results_filepath, plot_path
 
 
+import matplotlib
+matplotlib.use('Agg')  # Use a non-interactive backend
+
 def create_volcano_plot(results_df):
-    # Ensure the plot is saved to the static folder
+    matplotlib.use('Agg')  # Ensure non-interactive backend
     plot_path = os.path.join(app.config['STATIC_FOLDER'], 'volcano_plot.png')
 
     plt.figure(figsize=(10, 6))
-
-    # Plot the volcano plot
     plt.scatter(
         results_df['Log2FC'], 
         -np.log10(results_df['P-Value']), 
         c='blue', alpha=0.5, label='Significant Genes'
     )
 
-    # Highlight upregulated and downregulated genes
     upregulated = results_df[results_df['Log2FC'] >= 1]
     downregulated = results_df[results_df['Log2FC'] <= -1]
     plt.scatter(upregulated['Log2FC'], -np.log10(upregulated['P-Value']), color='red', label='Upregulated')
     plt.scatter(downregulated['Log2FC'], -np.log10(downregulated['P-Value']), color='green', label='Downregulated')
 
-    # Add labels and title
     plt.axhline(y=-np.log10(0.05), color='black', linestyle='--', label='p-value=0.05')
     plt.title('Volcano Plot - Differential Expression')
     plt.xlabel('Log2 Fold Change')
     plt.ylabel('-Log10(p-value)')
     plt.legend()
 
-    # Save the plot to the static folder
     plt.savefig(plot_path)
     plt.close()
 
     return plot_path
-
 
 if __name__ == '__main__':
     app.run(debug=True)

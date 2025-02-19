@@ -10,10 +10,11 @@
     
     <h2>Volcano Plot</h2>
     <!-- Display the plot -->
-    <img src="{{ url_for('static', filename='volcano_plot.png') }}" alt="Volcano Plot" width="600">
+    <img src="{{ url_for('processed', filename=volcano_plot_filename) }}" alt="Volcano Plot">
+
     
     <!-- Provide a download link for the plot -->
-    <p><a href="/static/volcano_plot.png" download>Download Volcano Plot</a></p>
+    <p><a href="/processed/volcano_plot.png" download>Download Volcano Plot</a></p>
 
 
     <h2>Download Results</h2>

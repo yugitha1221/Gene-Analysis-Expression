@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Differential Expression Analysis</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,6 +51,7 @@
             background-color: #3498db;
             color: white;
             cursor: pointer;
+            border: none;
         }
 
         button:hover {
@@ -57,34 +59,42 @@
             transform: translateY(-2px);
         }
 
-        .download-buttons {
+        /* Centering download buttons */
+        .download-container {
             display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
         }
 
-        .download-buttons a {
-            text-decoration: none;
-            color: white;
+        .download-button {
+            display: inline-block;
             background-color: #2c3e50;
-            padding: 10px;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
             border-radius: 5px;
+            font-size: 16px;
             text-align: center;
-            width: 48%;
+            width: 200px;
+            margin: 10px;
             transition: 0.3s ease-in-out;
         }
 
-        .download-buttons a:hover {
+        .download-button:hover {
             background-color: #1a252f;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <h1>Differential Expression Analysis</h1>
-    <div class="download-buttons">
-        <a href="/static/meta1.csv" download>Download Sample Metadata</a>
-        <a href="/static/expression1.csv" download>Download Sample Expression Data</a>
+
+    <div class="download-container">
+        <a href="/static/meta1.csv" class="download-button" download>Download Sample Metadata</a>
+        <a href="/static/expression1.csv" class="download-button" download>Download Sample Expression Data</a>
     </div>
+
     <br>
     <form id="analysisForm" enctype="multipart/form-data" method="POST">
         <label for="expression_file">Expression Data:</label>
@@ -102,7 +112,7 @@
         <button type="submit">Analyze</button>
     </form>
       
-    <div id="results"></div>
+    <div id="results" class="download-container"></div>
       
     <script>
         document.getElementById("analysisForm").addEventListener("submit", async function (e) {
@@ -122,10 +132,12 @@
         
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.filename) {
+                    if (data.filename && data.volcano_plot) {
                         resultsDiv.innerHTML = `
                             <p>Analysis complete.</p>
-                            <a href="/processed/${data.filename}" download>Download Results</a>`;
+                            <a href="/processed/${data.filename}" class="download-button" download>Download Results</a>
+                            <a href="/processed/${data.volcano_plot}" class="download-button" download>Download Volcano Plot</a>
+                        `;
                     } else {
                         resultsDiv.innerHTML = `<p>An error occurred: ${data.error}</p>`;
                     }
