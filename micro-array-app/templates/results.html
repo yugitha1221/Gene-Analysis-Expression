@@ -5,9 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preprocessing Results</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-image: url('/static/images/bg2.png') !important;
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          margin: 0;
+          padding: 0;
+          height: 100vh; /* Make sure the body takes full height of the viewport */
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+      }
+      button {
+            width: auto;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            transition: 0.3s ease-in-out;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
     <h1>Preprocessing Results</h1>
-    <p>Your file has been processed. <a href="/processed/{{ filename }}">Download it here.</a></p>
+    <button onclick="window.location.href='/processed/{{ filename }}'">Download Processed File</button>
 </body>
 </html>

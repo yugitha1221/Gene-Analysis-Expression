@@ -8,7 +8,7 @@
     <style>
           body {
             font-family: Arial, sans-serif;
-            background-image: url('/static/images/wallpaper.png') !important;
+            background-image: url('/static/images/bg2.png') !important;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -28,13 +28,19 @@
     <form method="POST" enctype="multipart/form-data">
         <label for="expression_file">Expression Data:</label>
         <input type="file" name="expression_file" required>
+    
+        <label for="metadata_file">Metadata File:</label>
+        <input type="file" name="metadata_file" required>
+    
         <label for="preprocess_type">Preprocessing Type:</label>
         <select name="preprocess_type">
             <option value="minmax">Min-Max Scaling</option>
             <option value="zscore">Z-Score Standardization</option>
             <option value="log">Log Transformation</option>
         </select>
+    
         <button type="submit">Preprocess</button>
     </form>
+    
 </body>
 </html>

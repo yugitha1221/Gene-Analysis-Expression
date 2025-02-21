@@ -29,31 +29,53 @@ def home():
 @app.route('/preprocessing', methods=['GET', 'POST'])
 def preprocessing():
     if request.method == 'POST':
-        # Handle file uploads
+        print("🔵 Received POST request")
+
         expression_file = request.files.get('expression_file')
         metadata_file = request.files.get('metadata_file')
-        
+
         if not expression_file or not metadata_file:
-            flash("Both expression data and metadata files are required.")
+            print("🔴 Error: One or both files missing!")
+            flash("Both files are required!", "error")
             return redirect(request.url)
 
-        # Save uploaded files
+        if expression_file.filename == '' or metadata_file.filename == '':
+            print("🔴 Error: Empty filename detected!")
+            flash("Invalid file upload!", "error")
+            return redirect(request.url)
+
+        # Save files
         expression_path = os.path.join(app.config['UPLOAD_FOLDER'], expression_file.filename)
         metadata_path = os.path.join(app.config['UPLOAD_FOLDER'], metadata_file.filename)
         expression_file.save(expression_path)
         metadata_file.save(metadata_path)
 
-        # Get preprocessing type
+        print(f"✅ Expression file saved at: {expression_path}")
+        print(f"✅ Metadata file saved at: {metadata_path}")
+
         preprocess_type = request.form.get('preprocess_type')
+        print(f"📌 Preprocess Type: {preprocess_type}")
 
         try:
-            preprocessed_filepath = preprocess_file(expression_path, preprocess_type)
-            return render_template('results.html', filename=os.path.basename(preprocessed_filepath))
+            preprocessed_filepath, plot_path = preprocess_file(expression_path, preprocess_type)
+            print(f"✅ Preprocessed file generated: {preprocessed_filepath}")
+
+            return render_template(
+                'results.html',
+                filename=os.path.basename(preprocessed_filepath),
+                plot_filename=os.path.basename(plot_path) if plot_path else None,
+                download_link=url_for('processed', filename=os.path.basename(preprocessed_filepath))
+
+            )
         except Exception as e:
-            flash(f"An error occurred during preprocessing: {e}")
+            print(f"🔴 Processing Error: {e}")
+            flash(f"Processing failed: {e}", "error")
             return redirect(request.url)
 
     return render_template('preprocessing.html')
+
+
+
 
 @app.route('/analysis', methods=['GET', 'POST'])
 def analysis():
@@ -124,29 +146,35 @@ def visualization(filename):
         return redirect(url_for('home'))
 
 # Download processed file
-@app.route('/processed/<path:filename>')
-def serve_processed_file(filename):
-    return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
-
-# Preprocess file function
 def preprocess_file(filepath, preprocess_type):
-    data = pd.read_csv(filepath)
-    numeric_columns = data.columns[1:]
+    try:
+        data = pd.read_csv(filepath)
+        numeric_columns = data.select_dtypes(include=[np.number]).columns
 
-    if preprocess_type == 'minmax':
-        scaler = MinMaxScaler()
-        data[numeric_columns] = scaler.fit_transform(data[numeric_columns])
-    elif preprocess_type == 'zscore':
-        scaler = StandardScaler()
-        data[numeric_columns] = scaler.fit_transform(data[numeric_columns])
-    elif preprocess_type == 'log':
-        data[numeric_columns] = data[numeric_columns].applymap(lambda x: np.log(x + 1))
-    else:
-        raise ValueError("Invalid preprocessing type")
+        if numeric_columns.empty:
+            raise ValueError("No numeric columns found in the dataset.")
 
-    preprocessed_filepath = os.path.join(app.config['PROCESSED_FOLDER'], os.path.basename(filepath).replace('.csv', '_preprocessed.csv'))
-    data.to_csv(preprocessed_filepath, index=False)
-    return preprocessed_filepath
+        if preprocess_type == 'minmax':
+            scaler = MinMaxScaler()
+            data[numeric_columns] = scaler.fit_transform(data[numeric_columns])
+        elif preprocess_type == 'zscore':
+            scaler = StandardScaler()
+            data[numeric_columns] = scaler.fit_transform(data[numeric_columns])
+        elif preprocess_type == 'log':
+            data[numeric_columns] = data[numeric_columns].applymap(lambda x: np.log(x + 1) if x > 0 else 0)
+        else:
+            raise ValueError("Invalid preprocessing type")
+
+        preprocessed_filepath = os.path.join(app.config['PROCESSED_FOLDER'], os.path.basename(filepath).replace('.csv', '_preprocessed.csv'))
+        data.to_csv(preprocessed_filepath, index=False)
+
+        print(f"Processed file saved: {preprocessed_filepath}")
+
+        return preprocessed_filepath, None  # No plot for now
+    except Exception as e:
+        print(f"Error in preprocessing: {e}")
+        raise RuntimeError(f"Error in preprocessing: {e}")
+
 
 # Perform differential expression analysis
 def perform_analysis(expression_path, metadata_path, fold_change_cutoff, p_value_cutoff):
@@ -242,4 +270,4 @@ def create_volcano_plot(results_df):
     return plot_path
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  
